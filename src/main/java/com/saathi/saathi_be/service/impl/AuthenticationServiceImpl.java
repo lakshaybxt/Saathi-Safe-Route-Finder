@@ -4,6 +4,7 @@ import com.saathi.saathi_be.domain.dto.RegisterUserDto;
 import com.saathi.saathi_be.domain.entity.User;
 import com.saathi.saathi_be.repository.UserRepository;
 import com.saathi.saathi_be.service.AuthenticationService;
+import com.saathi.saathi_be.service.EmailService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,6 +18,7 @@ import java.util.Random;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final UserRepository userRepository;
+    private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
 
     @Override
