@@ -69,6 +69,5 @@ public class GeoLocationServiceImpl implements GeoLocationService {
         } catch (Exception e) {
             throw new GeoLocationException("Failed to resolve geolocation", e);
         }
-        return null;
     }
 }
