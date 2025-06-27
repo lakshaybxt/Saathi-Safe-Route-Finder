@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "address")
@@ -17,7 +18,7 @@ public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private int id;
+    private UUID id;
 
     @Column(nullable = true)
     private String locality;

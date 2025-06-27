@@ -41,6 +41,4 @@ public class Testimonial {
     public void onCreate() {
         createdAt = LocalDateTime.now();
     }
-
-
 }
