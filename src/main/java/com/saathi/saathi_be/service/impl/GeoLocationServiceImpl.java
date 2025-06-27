@@ -49,16 +49,23 @@ public class GeoLocationServiceImpl implements GeoLocationService {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(response.getBody());
 
-            if(root.isArray() && !root.isEmpty()) {
-                JsonNode location = root.get(0);
-                double lat = location.get("lat").asDouble();
-                double lon = location.get("lon").asDouble();
-
-                return GeoLocation.builder()
-                        .latitude(lat)
-                        .longitude(lon)
-                        .build();
+            if(!root.isArray() || root.isEmpty()) {
+                throw new GeoLocationException("No Location found for the address");
             }
+
+            JsonNode location = root.get(0);
+
+            if(!location.has("lat") || !location.has("lon")) {
+                throw new GeoLocationException("Location data is incomplete from geoLocation API");
+            }
+
+            double lat = location.get("lat").asDouble();
+            double lon = location.get("lon").asDouble();
+
+            return GeoLocation.builder()
+                    .latitude(lat)
+                    .longitude(lon)
+                    .build();
         } catch (Exception e) {
             throw new GeoLocationException("Failed to resolve geolocation", e);
         }
