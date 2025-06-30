@@ -6,6 +6,7 @@ import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
 import com.saathi.saathi_be.service.GeoLocationService;
 import com.saathi.saathi_be.service.SafeRouteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,7 @@ public class SafeRouteController {
     private final SafeRouteService safeRouteService;
 
     @PostMapping(path = "/safe")
-    public ResponseEntity<SafeRouteResponseDto> getSafeRoute(@RequestBody AddressRequestDto request) {
+    public ResponseEntity<SafeRouteResponseDto> getSafeRoute(@Valid @RequestBody AddressRequestDto request) {
         GeoLocation source = geoLocationService.geoLocate(request.getSource());
         GeoLocation destination = geoLocationService.geoLocate(request.getDestination());
 

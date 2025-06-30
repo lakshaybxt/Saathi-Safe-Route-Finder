@@ -8,9 +8,11 @@ import com.saathi.saathi_be.configuration.OrsConfig;
 import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
 import com.saathi.saathi_be.domain.dto.response.RoutePoint;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
+import com.saathi.saathi_be.domain.entity.Testimonial;
 import com.saathi.saathi_be.exceptions.RouteNotFoundException;
 import com.saathi.saathi_be.exceptions.RouteParsingException;
 import com.saathi.saathi_be.repository.PlaceRepository;
+import com.saathi.saathi_be.repository.TestimonialRepository;
 import com.saathi.saathi_be.service.GeoLocationService;
 import com.saathi.saathi_be.service.SafeRouteService;
 import com.saathi.saathi_be.utility.PolylineDecoder;
@@ -36,9 +38,11 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     private static final int SAMPLING_INTERVAL = 10;
     private static final double GEO_API_RATE = 0.9;
 
+    private final PlaceRepository placeRepository;
+    private final TestimonialRepository testimonialRepository;
+
     private final RestTemplate restTemplate;
     private final OrsConfig orsConfig;
-    private final PlaceRepository placeRepository;
     private final GeoLocationService geoLocationService;
 
     @Override
@@ -84,7 +88,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     private SafeRouteResponseDto parseRouteResponse(String responseBody) {
         String geometry = extractGeometry(responseBody);
         List<List<Double>> routeCoordinates = PolylineDecoder.decodePolyline(geometry);
-        List<RoutePoint> routePoints = new ArrayList<>(); // instead of this i can lat , lon, city name, color it will be good
+        List<RoutePoint> routePoints = new ArrayList<>();
 
         // Caching
         Map<String, String> cityCache = new HashMap<>();
@@ -115,6 +119,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
                     .color(color)
                     .build();
             routePoints.add(routePoint);
+
             /*
             // For avoid rate limiting
             try {
@@ -124,6 +129,19 @@ public class SafeRouteServiceImpl implements SafeRouteService {
             }
              */
         }
+        List<String> cityNames = routePoints.stream()
+                .map(RoutePoint::getCity)
+                .filter(city -> city != null && !city.isBlank())
+                .distinct()
+                .toList();
+
+        List<Testimonial> testimonials = testimonialRepository.findTop5ByPlace_NameInOrderByRatingDesc(cityNames);
+
+        List<String> tips = testimonials.stream()
+                .map(Testimonial::getTips)
+                .filter(tip -> tip != null && !tip.isBlank())
+                .limit(5)
+                .toList();
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -131,7 +149,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
             return SafeRouteResponseDto.builder()
                     .route(routePoints)
                     .summary(RouteSummaryUtil.buildRouteSummary(orsRoot, routePoints))
-                    .tips(List.of("Hello")) // TODO: Based on the testimonial
+                    .tips(tips) // TODO: Based on the testimonial
                     .build(); // TODO: Also add the nearest safest place
         } catch (JsonProcessingException e) {
             throw new RouteParsingException("Failed to parse route JSON response.", e);
