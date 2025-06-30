@@ -8,33 +8,30 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "address")
+@Table(name = "places")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Address {
+public class Place {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = true)
-    private String locality;
+    @Column(nullable = false, unique = true)
+    private String name;
 
     @Column(nullable = false)
-    private String city;
+    private double latitude;
 
     @Column(nullable = false)
-    private String state;
+    private double longitude;
 
-    @Column(nullable = true)
-    private String postalCode;
+    @Column
+    private String riskColor;
 
-    @Column(nullable = false)
-    private String country;
-
-    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Testimonial> testimonials = new ArrayList<>();
 }

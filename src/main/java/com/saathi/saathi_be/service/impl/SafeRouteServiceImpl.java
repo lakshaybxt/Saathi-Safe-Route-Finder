@@ -1,0 +1,163 @@
+package com.saathi.saathi_be.service.impl;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.RateLimiter;
+import com.saathi.saathi_be.configuration.OrsConfig;
+import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
+import com.saathi.saathi_be.domain.dto.response.RoutePoint;
+import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
+import com.saathi.saathi_be.exceptions.RouteNotFoundException;
+import com.saathi.saathi_be.exceptions.RouteParsingException;
+import com.saathi.saathi_be.repository.PlaceRepository;
+import com.saathi.saathi_be.service.GeoLocationService;
+import com.saathi.saathi_be.service.SafeRouteService;
+import com.saathi.saathi_be.utility.PolylineDecoder;
+import com.saathi.saathi_be.utility.RouteSummaryUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+@RequiredArgsConstructor
+public class SafeRouteServiceImpl implements SafeRouteService {
+
+    private static final int SAMPLING_INTERVAL = 10;
+    private static final double GEO_API_RATE = 0.9;
+
+    private final RestTemplate restTemplate;
+    private final OrsConfig orsConfig;
+    private final PlaceRepository placeRepository;
+    private final GeoLocationService geoLocationService;
+
+    @Override
+    public SafeRouteResponseDto generateSafeRoute(SafeRouteRequestDto request) {
+        String mode = request.getMode();
+        String url = "https://api.openrouteservice.org/v2/directions/" + mode + "/geojson";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", orsConfig.getApiKey());
+
+        List<List<Double>> coordinates = List.of(
+                parseCoordinates(request.getSource()),
+                parseCoordinates(request.getDestination())
+        );
+
+        Map<String, Object> body = Map.of("coordinates", coordinates);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.postForEntity(
+                url, entity, String.class
+        );
+
+        String responseBody = response.getBody();
+        if(responseBody == null || responseBody.isEmpty()) {
+            throw new RouteParsingException("OpenRouteService returned empty response");
+        }
+
+        return parseRouteResponse(responseBody);
+    }
+
+    private List<Double> parseCoordinates(String destination) {
+        try {
+            String[] parts = destination.split(",");
+            if(parts.length != 2) throw new IllegalArgumentException("Invalid coordinates format.");
+            double lat = Double.parseDouble(parts[0].trim());
+            double lon = Double.parseDouble(parts[1].trim());
+            return List.of(lon, lat);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid coordinates numbers.");
+        }
+    }
+
+    private SafeRouteResponseDto parseRouteResponse(String responseBody) {
+        String geometry = extractGeometry(responseBody);
+        List<List<Double>> routeCoordinates = PolylineDecoder.decodePolyline(geometry);
+        List<RoutePoint> routePoints = new ArrayList<>(); // instead of this i can lat , lon, city name, color it will be good
+
+        // Caching
+        Map<String, String> cityCache = new HashMap<>();
+
+        // Unstable so might later I can change
+        RateLimiter rateLimiter = RateLimiter.create(GEO_API_RATE); // ~ 1 call per second
+
+        for(int i = 0; i < routeCoordinates.size(); i += SAMPLING_INTERVAL) {
+            rateLimiter.acquire();
+
+            List<Double> point = routeCoordinates.get(i);
+            double lon = point.get(0);
+            double lat = point.get(1);
+            String key = lat + "," + lon;
+
+            /*“If the key is not present in the map, then:
+            Call mappingFunction.apply(key)
+            Store the result as map.put(key, result)
+            Return the result”*/
+            String city = cityCache.computeIfAbsent(key, k ->
+                    geoLocationService.reverseGeocode(lat, lon));
+            String color = getRiskColorByCity(city); // if no data then gray
+
+            RoutePoint routePoint = RoutePoint.builder()
+                    .lat(lat)
+                    .lon(lon)
+                    .city(city)
+                    .color(color)
+                    .build();
+            routePoints.add(routePoint);
+            /*
+            // For avoid rate limiting
+            try {
+                Thread.sleep(1100);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+             */
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode orsRoot = mapper.readTree(responseBody);
+            return SafeRouteResponseDto.builder()
+                    .route(routePoints)
+                    .summary(RouteSummaryUtil.buildRouteSummary(orsRoot, routePoints))
+                    .tips(List.of("Hello")) // TODO: Based on the testimonial
+                    .build(); // TODO: Also add the nearest safest place
+        } catch (JsonProcessingException e) {
+            throw new RouteParsingException("Failed to parse route JSON response.", e);
+        }
+    }
+
+    public String extractGeometry(String jsonResponse) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(jsonResponse);
+
+            JsonNode routes = root.get("routes");
+
+            if(!routes.isArray() || routes.isEmpty()) {
+                throw new RouteNotFoundException("No route found in the response.");
+            }
+
+            return routes.get(0).path("geometry").asText();
+
+        } catch (IOException e) {
+            throw new RouteParsingException("Failed to parse route JSON response.", e);
+        }
+    }
+
+    @Cacheable("riskColorByCity")
+    public String getRiskColorByCity(String city) {
+        return placeRepository.findRiskColorByCityName(city).orElse("gray");
+    }
+}

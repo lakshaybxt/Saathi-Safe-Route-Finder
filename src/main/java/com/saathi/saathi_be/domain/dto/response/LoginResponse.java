@@ -1,4 +1,4 @@
-package com.saathi.saathi_be.response;
+package com.saathi.saathi_be.domain.dto.response;
 
 import lombok.*;
 

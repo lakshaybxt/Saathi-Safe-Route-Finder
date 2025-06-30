@@ -3,6 +3,8 @@ package com.saathi.saathi_be.controller;
 import com.saathi.saathi_be.domain.dto.error.ErrorDto;
 import com.saathi.saathi_be.exceptions.BaseException;
 import com.saathi.saathi_be.exceptions.GeoLocationException;
+import com.saathi.saathi_be.exceptions.RouteNotFoundException;
+import com.saathi.saathi_be.exceptions.RouteParsingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,5 +72,29 @@ public class ErrorController {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RouteNotFoundException.class)
+    public ResponseEntity<ErrorDto> handleGeoLocationException(RouteNotFoundException ex) {
+        log.error("Route not found error occurred", ex);
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(RouteParsingException.class)
+    public ResponseEntity<ErrorDto> handleGeoLocationException(RouteParsingException ex) {
+        log.error("Route Parsing error occurred", ex);
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

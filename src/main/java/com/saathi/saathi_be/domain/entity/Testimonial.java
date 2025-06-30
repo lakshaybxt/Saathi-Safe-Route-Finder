@@ -34,6 +34,10 @@ public class Testimonial {
     @JoinColumn(name = "address_id", nullable = false)
     private Address address;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "place_id", nullable = false)
+    private Place place;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
