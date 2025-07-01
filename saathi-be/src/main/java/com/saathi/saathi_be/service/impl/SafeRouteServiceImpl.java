@@ -149,7 +149,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
             return SafeRouteResponseDto.builder()
                     .route(routePoints)
                     .summary(RouteSummaryUtil.buildRouteSummary(orsRoot, routePoints))
-                    .tips(tips) // TODO: Based on the testimonial
+                    .tips(tips)
                     .build(); // TODO: Also add the nearest safest place
         } catch (JsonProcessingException e) {
             throw new RouteParsingException("Failed to parse route JSON response.", e);
