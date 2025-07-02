@@ -37,6 +37,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
 
     private static final int SAMPLING_INTERVAL = 10;
     private static final double GEO_API_RATE = 0.9;
+    private static final String DEFAULT_PROFILE = "driving-car";
 
     private final PlaceRepository placeRepository;
     private final TestimonialRepository testimonialRepository;
@@ -48,7 +49,8 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     @Override
     public SafeRouteResponseDto generateSafeRoute(SafeRouteRequestDto request) {
         String mode = request.getMode();
-        String url = "https://api.openrouteservice.org/v2/directions/" + mode + "/geojson";
+        String orsProfile = mapModeToOrsProfile(mode);
+        String url = "https://api.openrouteservice.org/v2/directions/" + orsProfile + "/geojson";
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", orsConfig.getApiKey());
@@ -71,6 +73,29 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         }
 
         return parseRouteResponse(responseBody);
+    }
+
+    private String mapModeToOrsProfile(String mode) {
+        if(mode == null || mode.isBlank()) {
+            return DEFAULT_PROFILE;
+        }
+
+        return switch (mode.toLowerCase().trim()) {
+            case "driving", "car", "auto", "vehicle" -> "driving-car";
+            case "driving-hgv", "truck", "hgv" -> "driving-hgv";
+            case "cycling", "bike", "bicycle" -> "cycling-regular";
+            case "cycling-road", "road-bike" -> "cycling-road";
+            case "cycling-mountain", "mountain-bike" -> "cycling-mountain";
+            case "cycling-electric", "e-bike" -> "cycling-electric";
+            case "walking", "foot", "pedestrian" -> "foot-walking";
+            case "hiking", "trekking" -> "foot-hiking";
+            case "wheelchair", "accessibility" -> "wheelchair";
+            default -> {
+                // Log warning about unknown mode
+                System.err.println("Warning: Unknown mode '" + mode + "', using default profile: " + DEFAULT_PROFILE);
+                yield DEFAULT_PROFILE;
+            }
+        };
     }
 
     private List<Double> parseCoordinates(String destination) {
@@ -176,6 +201,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
 
     @Cacheable("riskColorByCity")
     public String getRiskColorByCity(String city) {
-        return placeRepository.findRiskColorByCityName(city).orElse("gray");
+        return placeRepository.findRiskColorByCityName(city).orElse("gray"); // city + state
     }
+
 }

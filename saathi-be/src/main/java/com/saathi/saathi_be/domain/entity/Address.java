@@ -34,7 +34,7 @@ public class Address {
 
     @Column(nullable = false)
     private String country;
-
-    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Testimonial> testimonials = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Testimonial> testimonials = new ArrayList<>();
 }

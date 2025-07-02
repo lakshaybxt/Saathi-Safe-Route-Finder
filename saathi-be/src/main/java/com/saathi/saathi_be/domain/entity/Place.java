@@ -24,6 +24,9 @@ public class Place {
     private String name;
 
     @Column(nullable = false)
+    private String state;
+
+    @Column(nullable = false)
     private double latitude;
 
     @Column(nullable = false)

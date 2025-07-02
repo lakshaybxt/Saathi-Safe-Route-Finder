@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface TestimonialRepository extends JpaRepository<Testimonial, UUID> {
     List<Testimonial> findTop5ByPlace_NameInOrderByRatingDesc(List<String> placeNames);
+    List<Testimonial> findAllByPlace_Id(UUID placeId);
 }
