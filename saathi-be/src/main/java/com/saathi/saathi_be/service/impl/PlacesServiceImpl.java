@@ -54,6 +54,6 @@ public class PlacesServiceImpl implements PlaceService {
 
     @Override
     public List<Place> getHighRiskAreaByState(String color, String state) {
-        return placeRepository.findByRiskColorAndState(color, state);
+        return placeRepository.findByRiskColorAndStateIgnoreCase(color, state);
     }
 }

@@ -32,7 +32,7 @@ public class PlaceController {
         return ResponseEntity.ok(placeDto);
     }
 
-    @PostMapping// Should return UUID
+    @PostMapping
     public ResponseEntity<PlaceDto> saveLocation(@Valid @RequestBody AddressDto addressDto) {
         Place place = placesService.saveLocation(addressDto);
         PlaceDto placeDto = placeMapper.toDto(place);

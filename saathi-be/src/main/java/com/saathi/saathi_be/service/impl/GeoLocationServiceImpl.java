@@ -30,9 +30,8 @@ public class GeoLocationServiceImpl implements GeoLocationService {
     @Override
     public GeoLocation geoLocate(AddressDto address) {
         try {
-            String fullAddress = String.format("%s %s %s %s %s",
+            String fullAddress = String.format("%s %s %s %s",
                     address.getLocality(),
-                    address.getCity(),
                     address.getState(),
                     address.getPostalCode(),
                     address.getCountry()

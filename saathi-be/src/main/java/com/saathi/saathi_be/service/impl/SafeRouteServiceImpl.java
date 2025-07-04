@@ -81,7 +81,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
 
     @Override
     public List<RiskSummaryResponse> countRiskColorByState(String state) {
-        List<Object[]> places = placeRepository.countRiskColorGroupByState(state);
+        List<Object[]> places = placeRepository.countRiskColorGroupByState(state.toLowerCase());
 
         return places.stream()
                 .map(obj -> RiskSummaryResponse.builder()

@@ -8,6 +8,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class TestimonialResponse {
+    private String id;
     private String comment;
     private int rating;
     private String tips;

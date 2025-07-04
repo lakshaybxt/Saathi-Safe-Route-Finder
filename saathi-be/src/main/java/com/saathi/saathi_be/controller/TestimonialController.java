@@ -43,7 +43,7 @@ public class TestimonialController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(path = "/places/{placeId}/")
+    @GetMapping(path = "/places/{placeId}")
     public ResponseEntity<List<TestimonialResponse>> getTestimonialByPlace(@PathVariable UUID placeId) {
         List<Testimonial> testimonials = testimonialService.getTestimonialByPlaceId(placeId);
 
