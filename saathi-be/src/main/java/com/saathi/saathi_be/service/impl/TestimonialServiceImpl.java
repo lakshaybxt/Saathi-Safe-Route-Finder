@@ -42,6 +42,11 @@ public class TestimonialServiceImpl implements TestimonialService {
         return testimonialRepository.save(testimonial);
     }
 
+    @Override
+    public List<Testimonial> getTestimonialByPlaceId(UUID placeId) {
+        return List.of();
+    }
+
     private String calculateRiskColor(UUID placeId, TestimonialDto testimonialDto) {
         List<Testimonial> testimonials = testimonialRepository.findAllByPlace_Id(placeId);
 

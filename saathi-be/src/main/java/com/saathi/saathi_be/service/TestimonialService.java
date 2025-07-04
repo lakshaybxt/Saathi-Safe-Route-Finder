@@ -7,8 +7,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface TestimonialService {
     Testimonial reportArea(TestimonialDto testimonialDto, User loginUser);
+    List<Testimonial> getTestimonialByPlaceId(UUID placeId);
 }

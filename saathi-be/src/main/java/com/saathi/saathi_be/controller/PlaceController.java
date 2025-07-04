@@ -38,4 +38,6 @@ public class PlaceController {
         PlaceDto placeDto = placeMapper.toDto(place);
         return ResponseEntity.ok(placeDto);
     }
+
+
 }
