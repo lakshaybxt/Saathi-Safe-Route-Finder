@@ -1,6 +1,7 @@
 package com.saathi.saathi_be.repository;
 
 import com.saathi.saathi_be.domain.entity.Testimonial;
+import com.saathi.saathi_be.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +27,5 @@ public interface TestimonialRepository extends JpaRepository<Testimonial, UUID> 
     """, nativeQuery = true)
     List<Testimonial> findTop5ByPlace_LocalityInOrderByRatingDesc(@Param("parts") String[] parts);
     List<Testimonial> findAllByPlace_Id(UUID placeId);
+    List<Testimonial> findAllByUser(User user);
 }

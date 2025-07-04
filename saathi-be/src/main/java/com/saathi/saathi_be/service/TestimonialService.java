@@ -13,4 +13,8 @@ import java.util.UUID;
 public interface TestimonialService {
     Testimonial reportArea(TestimonialDto testimonialDto, User loginUser);
     List<Testimonial> getTestimonialByPlaceId(UUID placeId);
+    List<Testimonial> getTestimonialByUser(User user);
+    Testimonial getTestimonialById(UUID id);
+    Testimonial updateTestimonial(UUID id, TestimonialDto testimonialDto);
+    void deleteTestimonial(UUID id);
 }

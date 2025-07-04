@@ -44,11 +44,49 @@ public class TestimonialServiceImpl implements TestimonialService {
 
     @Override
     public List<Testimonial> getTestimonialByPlaceId(UUID placeId) {
-        return List.of();
+        return testimonialRepository.findAllByPlace_Id(placeId);
+    }
+
+    @Override
+    public List<Testimonial> getTestimonialByUser(User user) {
+        return testimonialRepository.findAllByUser(user);
+    }
+
+    @Override
+    public Testimonial getTestimonialById(UUID id) {
+        return testimonialRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Testimonial not found with id: " + id));
+    }
+
+    @Override
+    public Testimonial updateTestimonial(UUID id, TestimonialDto testimonialDto) {
+        Testimonial existingTestimonial = getTestimonialById(id);
+
+        if(!existingTestimonial.getPlace().getId().equals(testimonialDto.getPlaceId())) {
+            Place place = placeRepository.findById(testimonialDto.getPlaceId())
+                    .orElseThrow(() -> new EntityNotFoundException("Place not found with id: " + testimonialDto.getPlaceId()));
+
+            place.setRiskColor(calculateRiskColor(place.getId(), testimonialDto));
+            placeRepository.save(place);
+
+            existingTestimonial.setPlace(place);
+        }
+
+        existingTestimonial.setRating(testimonialDto.getRating());
+        existingTestimonial.setComment(testimonialDto.getComment());
+        existingTestimonial.setTips(testimonialDto.getTips());
+
+        return testimonialRepository.save(existingTestimonial);
+    }
+
+    @Override
+    public void deleteTestimonial(UUID id) {
+        Testimonial existingTestimonial = getTestimonialById(id);
+        testimonialRepository.delete(existingTestimonial);
     }
 
     private String calculateRiskColor(UUID placeId, TestimonialDto testimonialDto) {
-        List<Testimonial> testimonials = testimonialRepository.findAllByPlace_Id(placeId);
+        List<Testimonial> testimonials = getTestimonialByPlaceId(placeId);
 
         List<Integer> ratings = testimonials.stream()
                 .map(Testimonial::getRating)
