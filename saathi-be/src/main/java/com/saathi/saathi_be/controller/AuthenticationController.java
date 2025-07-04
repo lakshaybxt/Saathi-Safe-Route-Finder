@@ -7,12 +7,16 @@ import com.saathi.saathi_be.domain.entity.User;
 import com.saathi.saathi_be.domain.dto.response.LoginResponse;
 import com.saathi.saathi_be.service.AuthenticationService;
 import com.saathi.saathi_be.service.JwtService;
+import com.saathi.saathi_be.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -59,4 +63,5 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 }

@@ -48,6 +48,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .username(register.getUsername())
                 .email(register.getEmail())
                 .password(encoder.encode(register.getPassword()))
+                .gender(register.getGender())
+                .state(register.getState())
                 .verificationCode(generateVerificationCode())
                 .verificationCodeExpiration(LocalDateTime.now().plusMinutes(15))
                 .build();

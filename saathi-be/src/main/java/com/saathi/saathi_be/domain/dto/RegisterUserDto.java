@@ -21,4 +21,10 @@ public class RegisterUserDto {
 
     @NotBlank(message = "Username is required")
     private String username;
+
+    @NotBlank(message = "Gender is required")
+    private String gender;
+
+    @NotBlank(message = "State is required")
+    private String state;
 }
