@@ -18,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URLEncoder;
 import org.springframework.http.HttpHeaders;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -98,18 +100,31 @@ public class GeoLocationServiceImpl implements GeoLocationService {
             }
 
             JsonNode address = root.get("address");
+// TODO: search in db by contain any of this (add the locality in one)
+            String locality = Stream.of(
+                    address.path("neighbourhood").asText(null),
+                    address.path("suburb").asText(null),
+                    address.path("quarter").asText(null),
+                    address.path("locality").asText(null),
+                    address.path("village").asText(null),
+                    address.path("hamlet").asText(null),
+                    address.path("county").asText(null),
+                    address.path("amenity").asText(null)
+            ).filter(s -> s != null && !s.isBlank())
+            .collect(Collectors.joining(", ")
+            ).replaceAll(",\\s*,", ", ").replaceAll("^,|,$", "").trim();
+            // No use for city and state
+//            String locationName = String.format("%s, %s, %s",
+//                    locality,
+//                    address.path("city").asText(""),
+//                    address.path("state").asText("")
+//                    ).replaceAll(",\\s*,", ", ").replaceAll("^,|,$", "").trim();
 
-            String locationName = String.format("%s, %s, %s",
-                    address.path("neighbourhood").asText(""),
-                    address.path("city").asText(""),
-                    address.path("state").asText("")
-                    ).replaceAll(",\\s*,", ",").replaceAll("^,|,$", "").trim();
-
-            if(locationName.isBlank()) {
+            if(locality.isBlank()) {
                 throw new GeoLocationException("Incomplete location details from reverse geocoding");
             }
 
-            return locationName;
+            return locality;
 
         } catch (Exception e) {
             throw new GeoLocationException("Failed to resolve geocode location", e);

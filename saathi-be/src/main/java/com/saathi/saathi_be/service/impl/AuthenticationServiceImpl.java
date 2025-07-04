@@ -4,6 +4,7 @@ import com.saathi.saathi_be.domain.dto.LoginUserDto;
 import com.saathi.saathi_be.domain.dto.RegisterUserDto;
 import com.saathi.saathi_be.domain.dto.VerifyUserDto;
 import com.saathi.saathi_be.domain.entity.User;
+import com.saathi.saathi_be.exceptions.UserAlreadyExistsException;
 import com.saathi.saathi_be.repository.UserRepository;
 import com.saathi.saathi_be.service.AuthenticationService;
 import com.saathi.saathi_be.service.EmailService;
@@ -34,6 +35,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public User signup(RegisterUserDto register) {
+
+        if (userRepository.existsByEmail(register.getEmail())) {
+            throw new UserAlreadyExistsException("User with email " + register.getEmail() + " already exists");
+        }
+
+        if (userRepository.existsByUsername(register.getUsername())) {
+            throw new UserAlreadyExistsException("User with username " + register.getUsername() + " already exists");
+        }
+
         User user = User.builder()
                 .username(register.getUsername())
                 .email(register.getEmail())

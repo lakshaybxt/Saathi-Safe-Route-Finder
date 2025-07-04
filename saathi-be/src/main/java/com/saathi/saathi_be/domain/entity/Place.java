@@ -21,7 +21,10 @@ public class Place {
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    private String name;
+    private String locality;
+
+    @Column(nullable = false)
+    private String city;
 
     @Column(nullable = false)
     private String state;

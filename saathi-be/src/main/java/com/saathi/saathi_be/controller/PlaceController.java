@@ -25,11 +25,11 @@ public class PlaceController {
     @GetMapping
     public ResponseEntity<List<PlaceDto>> getAllPlaces() {
         List<Place> places = placesService.getALlPlaces();
-        List<PlaceDto> placeDtos = places.stream()
+        List<PlaceDto> placeDto = places.stream()
                 .map(placeMapper::toDto)
                 .toList();
 
-        return ResponseEntity.ok(placeDtos);
+        return ResponseEntity.ok(placeDto);
     }
 
     @PostMapping// Should return UUID

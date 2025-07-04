@@ -11,14 +11,14 @@ import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
 import com.saathi.saathi_be.domain.entity.Testimonial;
 import com.saathi.saathi_be.exceptions.RouteNotFoundException;
 import com.saathi.saathi_be.exceptions.RouteParsingException;
-import com.saathi.saathi_be.repository.PlaceRepository;
 import com.saathi.saathi_be.repository.TestimonialRepository;
 import com.saathi.saathi_be.service.GeoLocationService;
+import com.saathi.saathi_be.service.RiskColorCacheService;
 import com.saathi.saathi_be.service.SafeRouteService;
 import com.saathi.saathi_be.utility.PolylineDecoder;
 import com.saathi.saathi_be.utility.RouteSummaryUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -26,20 +26,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SafeRouteServiceImpl implements SafeRouteService {
 
     private static final int SAMPLING_INTERVAL = 10;
     private static final double GEO_API_RATE = 0.9;
     private static final String DEFAULT_PROFILE = "driving-car";
 
-    private final PlaceRepository placeRepository;
+    private final RiskColorCacheService riskColorCacheService;
     private final TestimonialRepository testimonialRepository;
 
     private final RestTemplate restTemplate;
@@ -50,7 +48,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     public SafeRouteResponseDto generateSafeRoute(SafeRouteRequestDto request) {
         String mode = request.getMode();
         String orsProfile = mapModeToOrsProfile(mode);
-        String url = "https://api.openrouteservice.org/v2/directions/" + orsProfile + "/geojson";
+        String url = "https://api.openrouteservice.org/v2/directions/" + orsProfile;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", orsConfig.getApiKey());
@@ -62,6 +60,8 @@ public class SafeRouteServiceImpl implements SafeRouteService {
 
         Map<String, Object> body = Map.of("coordinates", coordinates);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        System.out.println(body.toString());
 
         ResponseEntity<String> response = restTemplate.postForEntity(
                 url, entity, String.class
@@ -79,7 +79,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         if(mode == null || mode.isBlank()) {
             return DEFAULT_PROFILE;
         }
-
+        // Mode should be given this only otherwise error
         return switch (mode.toLowerCase().trim()) {
             case "driving", "car", "auto", "vehicle" -> "driving-car";
             case "driving-hgv", "truck", "hgv" -> "driving-hgv";
@@ -102,8 +102,10 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         try {
             String[] parts = destination.split(",");
             if(parts.length != 2) throw new IllegalArgumentException("Invalid coordinates format.");
-            double lat = Double.parseDouble(parts[0].trim());
-            double lon = Double.parseDouble(parts[1].trim());
+            double lon = Double.parseDouble(parts[0].trim());
+            System.out.print(lon + " ");
+            double lat = Double.parseDouble(parts[1].trim());
+            System.out.println(lat);
             return List.of(lon, lat);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid coordinates numbers.");
@@ -124,6 +126,10 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         for(int i = 0; i < routeCoordinates.size(); i += SAMPLING_INTERVAL) {
             rateLimiter.acquire();
 
+            if(i + SAMPLING_INTERVAL >= routeCoordinates.size()) {
+                i = routeCoordinates.size() - 1;
+            }
+
             List<Double> point = routeCoordinates.get(i);
             double lon = point.get(0);
             double lat = point.get(1);
@@ -133,14 +139,17 @@ public class SafeRouteServiceImpl implements SafeRouteService {
             Call mappingFunction.apply(key)
             Store the result as map.put(key, result)
             Return the result”*/
-            String city = cityCache.computeIfAbsent(key, k ->
+            // locationName = locality + city + state (e.g., Burari, Delhi, Delhi)
+            String locationName = cityCache.computeIfAbsent(key, k ->
                     geoLocationService.reverseGeocode(lat, lon));
-            String color = getRiskColorByCity(city); // if no data then gray
+//            String locality = locationName.split(",")[0].trim();
+
+            String color = riskColorCacheService.getRiskColorByCity(locationName); // if no data then gray
 
             RoutePoint routePoint = RoutePoint.builder()
                     .lat(lat)
                     .lon(lon)
-                    .city(city)
+                    .city(locationName)
                     .color(color)
                     .build();
             routePoints.add(routePoint);
@@ -157,10 +166,21 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         List<String> cityNames = routePoints.stream()
                 .map(RoutePoint::getCity)
                 .filter(city -> city != null && !city.isBlank())
+                .flatMap(city -> Arrays.stream(city.split(",")))
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .filter(part -> !part.isBlank())
                 .distinct()
                 .toList();
 
-        List<Testimonial> testimonials = testimonialRepository.findTop5ByPlace_NameInOrderByRatingDesc(cityNames);
+        String[] cityNameArray = cityNames.toArray(new String[0]);
+        log.info("City Name Parts: {}", Arrays.toString(cityNameArray));
+
+        List<Testimonial> testimonials = testimonialRepository
+                .findTop5ByPlace_LocalityInOrderByRatingDesc(cityNameArray);
+
+        log.info("Fetched Testimonials: {}", testimonials);
+        log.info("Testimonial count: {}", testimonials.size());
 
         List<String> tips = testimonials.stream()
                 .map(Testimonial::getTips)
@@ -199,9 +219,6 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         }
     }
 
-    @Cacheable("riskColorByCity")
-    public String getRiskColorByCity(String city) {
-        return placeRepository.findRiskColorByCityName(city).orElse("gray"); // city + state
-    }
+
 
 }

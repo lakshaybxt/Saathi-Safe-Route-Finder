@@ -13,8 +13,21 @@ import java.util.UUID;
 @Repository
 public interface PlaceRepository extends JpaRepository<Place, UUID> {
 
-    @Query("SELECT p.riskColor FROM Place p WHERE LOWER(p.name) = LOWER(:city)")
+    @Query("SELECT p.riskColor FROM Place p WHERE LOWER(p.locality) = LOWER(:city)")
     Optional<String> findRiskColorByCityName(@Param("city") String city);
-    List<Place> findAllByOrderByNameAsc();
-    Optional<Place> findPlaceByNameAndState(String name, String state);
+
+    @Query(value = """
+        SELECT p.risk_color
+        FROM places p
+        WHERE EXISTS (
+            SELECT 1
+            FROM unnest(:parts) AS part
+            WHERE LOWER(p.locality) LIKE CONCAT('%', part, '%')
+        )
+        LIMIT 1
+    """, nativeQuery = true)
+    String findRiskColorByLocalityContaining(@Param("parts") String[] parts);
+
+    List<Place> findAllByOrderByLocalityAsc();
+    Optional<Place> findPlaceByLocalityAndState(String name, String state);
 }

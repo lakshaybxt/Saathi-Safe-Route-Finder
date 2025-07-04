@@ -1,10 +1,7 @@
 package com.saathi.saathi_be.controller;
 
 import com.saathi.saathi_be.domain.dto.error.ErrorDto;
-import com.saathi.saathi_be.exceptions.BaseException;
-import com.saathi.saathi_be.exceptions.GeoLocationException;
-import com.saathi.saathi_be.exceptions.RouteNotFoundException;
-import com.saathi.saathi_be.exceptions.RouteParsingException;
+import com.saathi.saathi_be.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -96,5 +93,17 @@ public class ErrorController {
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorDto> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        log.error("User already exist", ex);
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 }

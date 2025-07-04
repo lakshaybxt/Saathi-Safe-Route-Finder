@@ -1,7 +1,5 @@
 package com.saathi.saathi_be.controller;
 
-import com.saathi.saathi_be.domain.dto.AddressDto;
-import com.saathi.saathi_be.domain.dto.PlaceDto;
 import com.saathi.saathi_be.domain.dto.TestimonialDto;
 import com.saathi.saathi_be.domain.dto.response.TestimonialResponse;
 import com.saathi.saathi_be.domain.entity.Testimonial;
@@ -35,7 +33,7 @@ public class TestimonialController {
                 .comment(testimonial.getComment())
                 .tips(testimonial.getTips())
                 .rating(testimonial.getRating())
-                .city(testimonial.getPlace().getName())
+                .city(testimonial.getPlace().getLocality())
                 .build();
         return ResponseEntity.ok(response);
     }

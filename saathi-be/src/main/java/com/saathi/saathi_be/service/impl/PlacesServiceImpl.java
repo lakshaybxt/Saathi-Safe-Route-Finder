@@ -22,13 +22,13 @@ public class PlacesServiceImpl implements PlaceService {
 
     @Override
     public List<Place> getALlPlaces() {
-        return placeRepository.findAllByOrderByNameAsc();
+        return placeRepository.findAllByOrderByLocalityAsc();
     }
 
     @Override
     public Place saveLocation(AddressDto addressDto) {
         Optional<Place> existingPlace = placeRepository
-                .findPlaceByNameAndState(addressDto.getLocality(), addressDto.getState());
+                .findPlaceByLocalityAndState(addressDto.getLocality(), addressDto.getState());
 
         if(existingPlace.isPresent()) {
             return existingPlace.get();
@@ -41,7 +41,8 @@ public class PlacesServiceImpl implements PlaceService {
         }
 
         Place place = Place.builder()
-                .name(addressDto.getLocality()) // Make more detailed name
+                .locality(addressDto.getLocality()) // Make more detailed locality
+                .city(addressDto.getCity())
                 .state(addressDto.getState())
                 .latitude(location.getLatitude())
                 .longitude(location.getLongitude())
