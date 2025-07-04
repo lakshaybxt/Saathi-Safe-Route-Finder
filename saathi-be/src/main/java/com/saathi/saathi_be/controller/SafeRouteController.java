@@ -6,7 +6,6 @@ import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
 import com.saathi.saathi_be.domain.dto.response.RiskSummaryResponse;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
 import com.saathi.saathi_be.service.GeoLocationService;
-import com.saathi.saathi_be.service.PlaceService;
 import com.saathi.saathi_be.service.SafeRouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +38,20 @@ public class SafeRouteController {
     }
 
     @GetMapping("/risk/summary")
-    public ResponseEntity<List<RiskSummaryResponse>> getRiskSummaryByCity(@RequestParam String city) {
-        if(city == null || city.isBlank()) {
+    public ResponseEntity<List<RiskSummaryResponse>> getRiskSummaryByCity(
+            @RequestParam(required = true) String state) {
+
+        if(state == null || state.isBlank()) {
             return ResponseEntity.badRequest().body(List.of());
         }
-        List<RiskSummaryResponse> response = safeRouteService.countRiskColorByCity(city);
+
+        state = state.trim();
+        List<RiskSummaryResponse> response = safeRouteService.countRiskColorByState(state);
+
+       if(response.isEmpty()) {
+           return ResponseEntity.noContent().build();
+       }
+
+        return ResponseEntity.ok(response);
     }
 }

@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface SafeRouteService {
     SafeRouteResponseDto generateSafeRoute(SafeRouteRequestDto request);
-    List<RiskSummaryResponse> countRiskColorByCity(String city);
+    List<RiskSummaryResponse> countRiskColorByState(String state);
 }

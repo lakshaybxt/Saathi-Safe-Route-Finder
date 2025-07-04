@@ -9,9 +9,11 @@ import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
 import com.saathi.saathi_be.domain.dto.response.RiskSummaryResponse;
 import com.saathi.saathi_be.domain.dto.response.RoutePoint;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
+import com.saathi.saathi_be.domain.entity.Place;
 import com.saathi.saathi_be.domain.entity.Testimonial;
 import com.saathi.saathi_be.exceptions.RouteNotFoundException;
 import com.saathi.saathi_be.exceptions.RouteParsingException;
+import com.saathi.saathi_be.repository.PlaceRepository;
 import com.saathi.saathi_be.repository.TestimonialRepository;
 import com.saathi.saathi_be.service.GeoLocationService;
 import com.saathi.saathi_be.service.RiskColorCacheService;
@@ -40,6 +42,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
 
     private final RiskColorCacheService riskColorCacheService;
     private final TestimonialRepository testimonialRepository;
+    private final PlaceRepository placeRepository;
 
     private final RestTemplate restTemplate;
     private final OrsConfig orsConfig;
@@ -77,8 +80,15 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     }
 
     @Override
-    public List<RiskSummaryResponse> countRiskColorByCity(String city) {
-        return List.of();
+    public List<RiskSummaryResponse> countRiskColorByState(String state) {
+        List<Object[]> places = placeRepository.countRiskColorGroupByState(state);
+
+        return places.stream()
+                .map(obj -> RiskSummaryResponse.builder()
+                        .color((String) obj[0])
+                        .count(((Number) obj[1]).longValue())
+                        .build()
+                ).toList();
     }
 
     private String mapModeToOrsProfile(String mode) {

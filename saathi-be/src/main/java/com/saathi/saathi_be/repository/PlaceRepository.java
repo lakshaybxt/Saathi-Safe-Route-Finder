@@ -33,4 +33,12 @@ public interface PlaceRepository extends JpaRepository<Place, UUID> {
     Optional<Place> findPlaceByLocalityAndState(String name, String state);
 
     List<Place> findByRiskColorAndState(String color, String state);
+
+    @Query(value = """
+        SELECT p.risk_color AS riskColor, COUNT(*) AS count
+        FROM places p
+        WHERE p.state = :state
+        GROUP BY p.risk_color
+    """, nativeQuery = true)
+    List<Object[]> countRiskColorGroupByState(@Param("state") String state);
 }
