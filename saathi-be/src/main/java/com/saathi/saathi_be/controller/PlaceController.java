@@ -39,5 +39,16 @@ public class PlaceController {
         return ResponseEntity.ok(placeDto);
     }
 
+    @GetMapping(path = "/highRisk")
+    public ResponseEntity<List<PlaceDto>> getHighRiskArea(@RequestParam String state) {
+        if(state == null || state.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        List<Place> redZones = placesService.getHighRiskAreaByState("red", state);
+        List<PlaceDto> placeDto = redZones.stream()
+                .map(placeMapper::toDto)
+                .toList();
 
+        return ResponseEntity.ok(placeDto);
+    }
 }

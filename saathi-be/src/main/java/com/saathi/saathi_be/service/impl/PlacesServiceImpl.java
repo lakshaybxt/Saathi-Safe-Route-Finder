@@ -51,4 +51,9 @@ public class PlacesServiceImpl implements PlaceService {
 
         return placeRepository.save(place);
     }
+
+    @Override
+    public List<Place> getHighRiskAreaByState(String color, String state) {
+        return placeRepository.findByRiskColorAndState(color, state);
+    }
 }

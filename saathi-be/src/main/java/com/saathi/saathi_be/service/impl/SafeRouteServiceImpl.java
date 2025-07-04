@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.RateLimiter;
 import com.saathi.saathi_be.configuration.OrsConfig;
 import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
+import com.saathi.saathi_be.domain.dto.response.RiskSummaryResponse;
 import com.saathi.saathi_be.domain.dto.response.RoutePoint;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
 import com.saathi.saathi_be.domain.entity.Testimonial;
@@ -73,6 +74,11 @@ public class SafeRouteServiceImpl implements SafeRouteService {
         }
 
         return parseRouteResponse(responseBody);
+    }
+
+    @Override
+    public List<RiskSummaryResponse> countRiskColorByCity(String city) {
+        return List.of();
     }
 
     private String mapModeToOrsProfile(String mode) {

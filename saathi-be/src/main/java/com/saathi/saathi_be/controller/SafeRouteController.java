@@ -3,16 +3,17 @@ package com.saathi.saathi_be.controller;
 import com.saathi.saathi_be.domain.GeoLocation;
 import com.saathi.saathi_be.domain.dto.request.AddressRequestDto;
 import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
+import com.saathi.saathi_be.domain.dto.response.RiskSummaryResponse;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
 import com.saathi.saathi_be.service.GeoLocationService;
+import com.saathi.saathi_be.service.PlaceService;
 import com.saathi.saathi_be.service.SafeRouteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/route")
@@ -35,5 +36,13 @@ public class SafeRouteController {
 
         SafeRouteResponseDto response = safeRouteService.generateSafeRoute(requestDto);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/risk/summary")
+    public ResponseEntity<List<RiskSummaryResponse>> getRiskSummaryByCity(@RequestParam String city) {
+        if(city == null || city.isBlank()) {
+            return ResponseEntity.badRequest().body(List.of());
+        }
+        List<RiskSummaryResponse> response = safeRouteService.countRiskColorByCity(city);
     }
 }

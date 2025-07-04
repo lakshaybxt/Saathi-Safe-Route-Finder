@@ -13,7 +13,7 @@ import java.util.Arrays;
 public class RiskColorCacheServiceImpl implements RiskColorCacheService {
 
     private final PlaceRepository placeRepository;
-    // todo: GIVE THIS PART IN DB FOR BATCH SEARCH
+
     @Override
     @Cacheable("riskColorByCity")
     public String getRiskColorByCity(String locality) {

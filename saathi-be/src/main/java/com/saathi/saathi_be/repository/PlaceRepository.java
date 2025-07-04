@@ -29,5 +29,8 @@ public interface PlaceRepository extends JpaRepository<Place, UUID> {
     String findRiskColorByLocalityContaining(@Param("parts") String[] parts);
 
     List<Place> findAllByOrderByLocalityAsc();
+
     Optional<Place> findPlaceByLocalityAndState(String name, String state);
+
+    List<Place> findByRiskColorAndState(String color, String state);
 }
