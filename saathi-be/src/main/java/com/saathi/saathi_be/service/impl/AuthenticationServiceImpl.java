@@ -3,11 +3,13 @@ package com.saathi.saathi_be.service.impl;
 import com.saathi.saathi_be.domain.dto.LoginUserDto;
 import com.saathi.saathi_be.domain.dto.RegisterUserDto;
 import com.saathi.saathi_be.domain.dto.VerifyUserDto;
+import com.saathi.saathi_be.domain.dto.request.UpdatePasswordRequest;
 import com.saathi.saathi_be.domain.entity.User;
 import com.saathi.saathi_be.exceptions.UserAlreadyExistsException;
 import com.saathi.saathi_be.repository.UserRepository;
 import com.saathi.saathi_be.service.AuthenticationService;
 import com.saathi.saathi_be.service.EmailService;
+import com.saathi.saathi_be.service.UserService;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserDetailsService userDetailsService;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
+    private final UserService userService;
 
     @Override
     public User signup(RegisterUserDto register) {
@@ -116,6 +120,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    @Override
+    public void updatePassword(UpdatePasswordRequest request, UUID userId) {
+        User existingUser = userService.getUserById(userId);
+
+        if (!encoder.matches(request.getOldPassword(), existingUser.getPassword())) {
+            throw new IllegalArgumentException("Old password does not match");
+        }
+
+        if (request.getOldPassword().equals(request.getNewPassword())) {
+            throw new IllegalArgumentException("New password cannot be same as old password");
+        }
+
+        String newHashPassword = encoder.encode(request.getNewPassword());
+        existingUser.setPassword(newHashPassword);
+        userRepository.save(existingUser);
     }
 
     private void sendVerificationEmail(User user) {

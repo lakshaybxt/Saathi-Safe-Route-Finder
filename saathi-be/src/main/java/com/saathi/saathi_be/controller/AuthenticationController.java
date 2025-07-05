@@ -3,8 +3,11 @@ package com.saathi.saathi_be.controller;
 import com.saathi.saathi_be.domain.dto.LoginUserDto;
 import com.saathi.saathi_be.domain.dto.RegisterUserDto;
 import com.saathi.saathi_be.domain.dto.VerifyUserDto;
+import com.saathi.saathi_be.domain.dto.request.UpdatePasswordRequest;
+import com.saathi.saathi_be.domain.dto.response.AuthUserResponse;
 import com.saathi.saathi_be.domain.entity.User;
 import com.saathi.saathi_be.domain.dto.response.LoginResponse;
+import com.saathi.saathi_be.mapper.UserMapper;
 import com.saathi.saathi_be.service.AuthenticationService;
 import com.saathi.saathi_be.service.JwtService;
 import com.saathi.saathi_be.service.UserService;
@@ -26,11 +29,13 @@ public class AuthenticationController {
 
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
+    private final UserMapper userMapper;
 
     @PostMapping(path = "/signup")
-    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
+    public ResponseEntity<AuthUserResponse> register(@Valid @RequestBody RegisterUserDto registerUserDto) {
         User registeredUser = authenticationService.signup(registerUserDto);
-        return ResponseEntity.ok(registeredUser);
+        AuthUserResponse response = userMapper.toResponse(registeredUser);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(path = "/login")
@@ -64,4 +69,20 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping(path = "/update")
+    public ResponseEntity<?> updatePassword(
+            @Valid @RequestBody UpdatePasswordRequest request,
+            @RequestAttribute UUID userId) {
+        try {
+            authenticationService.updatePassword(request, userId);
+            return ResponseEntity.ok("Password updated successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Something went wrong while updating the password.");
+        }
+    }
 }
