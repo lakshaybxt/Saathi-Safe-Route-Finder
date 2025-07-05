@@ -32,7 +32,7 @@ public class PasswordResetController {
     }
 
     @PostMapping(path = "/reset")
-    public ResponseEntity<?> verifyCode(@Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         try {
             userService.resetPassword(request);
             return ResponseEntity.ok("Password reset successfully.");

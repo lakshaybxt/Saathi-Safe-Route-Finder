@@ -88,6 +88,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetPassword(ResetPasswordRequest request) {
+        User existingUser = getUserByEmail(request.getEmail());
 
+        if(existingUser == null) {
+            throw new IllegalArgumentException("No user found with the requested mail: " + request.getEmail());
+        }
+
+        if(existingUser.getVerificationCode() == null ||
+                existingUser.getVerificationCodeExpiration().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Verification code is invalid or expired");
+        }
+
+        if(!existingUser.getVerificationCode().equals(request.getVerificationCode())) {
+            throw new IllegalArgumentException("Invalid verification code");
+        }
+
+        if(encoder.matches(request.getPassword(), existingUser.getPassword())) {
+            throw new IllegalArgumentException("New password must be different from the old password");
+        }
+
+        existingUser.setPassword(encoder.encode(request.getPassword()));
+        existingUser.setEnabled(true);
+        existingUser.setVerificationCode(null);
+        existingUser.setVerificationCodeExpiration(null);
+
+        userRepository.save(existingUser);
     }
 }
