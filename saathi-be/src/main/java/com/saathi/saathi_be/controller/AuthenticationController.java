@@ -69,20 +69,4 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping(path = "/update")
-    public ResponseEntity<?> updatePassword(
-            @Valid @RequestBody UpdatePasswordRequest request,
-            @RequestAttribute UUID userId) {
-        try {
-            authenticationService.updatePassword(request, userId);
-            return ResponseEntity.ok("Password updated successfully");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Something went wrong while updating the password.");
-        }
-    }
 }

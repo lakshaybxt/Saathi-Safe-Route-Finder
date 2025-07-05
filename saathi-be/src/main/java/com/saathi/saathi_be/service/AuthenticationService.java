@@ -15,5 +15,5 @@ public interface AuthenticationService {
     UserDetails authenticate(@Valid LoginUserDto request);
     void verifyUser(@Valid VerifyUserDto request);
     void resendVerificationEmail(String email);
-    void updatePassword(@Valid UpdatePasswordRequest request, UUID userId);
+    void sendVerificationEmail(User user);
 }

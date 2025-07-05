@@ -3,13 +3,12 @@ package com.saathi.saathi_be.service.impl;
 import com.saathi.saathi_be.domain.dto.LoginUserDto;
 import com.saathi.saathi_be.domain.dto.RegisterUserDto;
 import com.saathi.saathi_be.domain.dto.VerifyUserDto;
-import com.saathi.saathi_be.domain.dto.request.UpdatePasswordRequest;
 import com.saathi.saathi_be.domain.entity.User;
 import com.saathi.saathi_be.exceptions.UserAlreadyExistsException;
 import com.saathi.saathi_be.repository.UserRepository;
 import com.saathi.saathi_be.service.AuthenticationService;
 import com.saathi.saathi_be.service.EmailService;
-import com.saathi.saathi_be.service.UserService;
+import com.saathi.saathi_be.utility.VerificationCodeUtil;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,8 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +32,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserDetailsService userDetailsService;
     private final EmailService emailService;
     private final BCryptPasswordEncoder encoder;
-    private final UserService userService;
 
     @Override
     public User signup(RegisterUserDto register) {
@@ -54,7 +50,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .password(encoder.encode(register.getPassword()))
                 .gender(register.getGender())
                 .state(register.getState())
-                .verificationCode(generateVerificationCode())
+                .verificationCode(VerificationCodeUtil.generateVerificationCode())
                 .verificationCodeExpiration(LocalDateTime.now().plusMinutes(15))
                 .build();
 
@@ -113,7 +109,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             if(user.isEnabled()) {
                 throw new RuntimeException("Account is already verified");
             }
-            user.setVerificationCode(generateVerificationCode());
+            user.setVerificationCode(VerificationCodeUtil.generateVerificationCode());
             user.setVerificationCodeExpiration(LocalDateTime.now().plusMinutes(15));
             userRepository.save(user);
             sendVerificationEmail(user);
@@ -123,23 +119,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void updatePassword(UpdatePasswordRequest request, UUID userId) {
-        User existingUser = userService.getUserById(userId);
-
-        if (!encoder.matches(request.getOldPassword(), existingUser.getPassword())) {
-            throw new IllegalArgumentException("Old password does not match");
-        }
-
-        if (request.getOldPassword().equals(request.getNewPassword())) {
-            throw new IllegalArgumentException("New password cannot be same as old password");
-        }
-
-        String newHashPassword = encoder.encode(request.getNewPassword());
-        existingUser.setPassword(newHashPassword);
-        userRepository.save(existingUser);
-    }
-
-    private void sendVerificationEmail(User user) {
+    public void sendVerificationEmail(User user) {
         String subject = "Verify your email";
         String verificationCode = "VERIFICATION CODE " + user.getVerificationCode();
         String htmlMessage = "<html>" +
@@ -166,9 +146,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
     }
 
-    private String generateVerificationCode() {
-        Random random = new Random();
-        int code = random.nextInt(900000) + 100000;
-        return String.valueOf(code);
-    }
 }
