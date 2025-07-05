@@ -21,10 +21,10 @@ public class EmergencyContact {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String phoneNo;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String relation;
 
     @ManyToOne(fetch = FetchType.LAZY)

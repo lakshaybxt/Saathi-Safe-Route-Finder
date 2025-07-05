@@ -1,6 +1,5 @@
 package com.saathi.saathi_be.controller;
 
-import com.saathi.saathi_be.domain.dto.RegisterUserDto;
 import com.saathi.saathi_be.domain.dto.request.UpdatePasswordRequest;
 import com.saathi.saathi_be.domain.dto.request.UpdateUserRequest;
 import com.saathi.saathi_be.domain.dto.response.UserProfileResponse;

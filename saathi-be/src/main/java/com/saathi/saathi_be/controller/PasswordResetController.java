@@ -1,9 +1,7 @@
 package com.saathi.saathi_be.controller;
 
-import com.saathi.saathi_be.domain.dto.VerifyUserDto;
 import com.saathi.saathi_be.domain.dto.request.ResetPasswordRequest;
 import com.saathi.saathi_be.domain.dto.request.UserEmailRequest;
-import com.saathi.saathi_be.domain.entity.User;
 import com.saathi.saathi_be.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

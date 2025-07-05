@@ -9,7 +9,6 @@ import com.saathi.saathi_be.domain.dto.request.SafeRouteRequestDto;
 import com.saathi.saathi_be.domain.dto.response.RiskSummaryResponse;
 import com.saathi.saathi_be.domain.dto.response.RoutePoint;
 import com.saathi.saathi_be.domain.dto.response.SafeRouteResponseDto;
-import com.saathi.saathi_be.domain.entity.Place;
 import com.saathi.saathi_be.domain.entity.Testimonial;
 import com.saathi.saathi_be.exceptions.RouteNotFoundException;
 import com.saathi.saathi_be.exceptions.RouteParsingException;
