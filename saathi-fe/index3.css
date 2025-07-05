@@ -1,0 +1,66 @@
+body {
+  background-image: url("https://wallpaperaccess.com/full/530683.jpg");
+  background-size: cover;
+  font-family: Arial, sans-serif;
+}
+
+.heading {
+  color: black;
+  font-weight: bolder;
+  margin-left: 200px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 50px;
+  width: 50px;
+  border: 2px solid black;
+  border-radius: 50%;
+  background-image: url("https://bangaloreinternationalcentre.org/wp-content/uploads/Sathi_logo-768x847.jpg");
+  background-size: cover;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.theme {
+  margin-left: 200px;
+  font-size: 24px;
+  color: #333;
+  font-weight: bolder;
+}
+
+.searchbar {
+  margin-top: 200px;
+  margin-left: 600px;
+}
+
+#search {
+  margin-bottom: 10px;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 300px;
+  height: 40px;
+  font-size: 16px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.btn {
+  width: 320px;
+  height: 45px;
+  font-size: 16px;
+  margin-top: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #45a049;
+}
