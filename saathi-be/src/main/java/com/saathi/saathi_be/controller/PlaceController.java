@@ -4,7 +4,6 @@ import com.saathi.saathi_be.domain.dto.AddressDto;
 import com.saathi.saathi_be.domain.dto.PlaceDto;
 import com.saathi.saathi_be.domain.entity.Place;
 import com.saathi.saathi_be.mapper.PlaceMapper;
-import com.saathi.saathi_be.service.GeoLocationService;
 import com.saathi.saathi_be.service.PlaceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +19,6 @@ public class PlaceController {
 
     private final PlaceService placesService;
     private final PlaceMapper placeMapper;
-    private final GeoLocationService geoLocationService;
 
     @GetMapping
     public ResponseEntity<List<PlaceDto>> getAllPlaces() {
