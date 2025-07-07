@@ -1,0 +1,37 @@
+.navbar {
+    display: flex;
+    top: 0;
+    right: 0;
+    left: 0;
+    /* width: 100%; */
+    position: fixed;
+    z-index: 10000;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    color: white;
+    justify-content: space-between;
+    overflow: hidden;
+}
+
+.saathi-logo {
+  height: 50px;
+  background-color: transparent;
+
+}
+
+.nav-list {
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Courier New', Courier, monospace;
+  gap: 3rem;
+}
+
+.nav-list a {
+  text-decoration: none;
+  color: white;
+  font-weight: lighter;
+/* gap: 5; */
+}
