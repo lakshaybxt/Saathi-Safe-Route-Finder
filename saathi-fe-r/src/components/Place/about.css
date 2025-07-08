@@ -1,13 +1,12 @@
 
 .content {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 40px;
     font-family: Arial, Helvetica, sans-serif;
-    padding-top: 100px;
-    /* margin-top: 40px; */
 }
+
 .parent {
     background-color: #52B2E5;
     position: relative;

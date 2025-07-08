@@ -1,61 +1,195 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 body .form {
-    font-family: 'Courier New'
+  font-family: 'Courier New'
 }
 
-.main-class {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    justify-items: center;
-    gap: 0px;
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.form {
+.steps-indicator {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 40px;
+  margin-top: 40px;
+}
+
+.steps-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+}
+
+.step-number {
+    font-family: 'Courier New';
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.step-label {
+    font-size: 14px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.step-line {
+    width: 80px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    position: relative;
+    margin-top: -20px;
+}
+
+/* Step States */
+.step.active .step-number {
+    background: #52B2E5;
+    color: white;
+    border-color: #52B2E5;
+}
+
+.step.active .step-label {
+    color: #52B2E5;
+    font-weight: 600;
+}
+
+.step.completed .step-number {
+    background: #10B981;
+    color: white;
+    border-color: #10B981;
+}
+
+.step.completed .step-label {
+    color: #10B981;
+    font-weight: 600;
+}
+
+.step.completed .step-line::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #10B981;
+}
+
+/* Default state */
+.step .step-number {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.step .step-label {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .step-container {
+        gap: 15px;
+    }
+    
+    .step {
+        min-width: 80px;
+    }
+    
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+    
+    .step-label {
+        font-size: 12px;
+    }
+    
+    .step-line {
+        width: 60px;
+        margin-top: -17px;
+    }
+}
+
+.main-class {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: center;
+  max-width: 1500px;
+  gap: 60px;
+  width: 100%;
+  padding: 20px;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .place-form,
 .testimonial-form {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(8px);
-    border-radius: 16px;
-    padding: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
 }
 
 h2 {
-    margin-bottom: 2rem;
-    color: white;
-    font-size: 28px;
-    padding-left: 20px;
+  margin-bottom: 2rem;
+  color: white;
+  font-size: 28px;
+  padding-left: 20px;
 }
 
 
 .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    /* gap: 100px; */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
 .form-group {
-    position: relative;
-    margin: 20px;
+  position: relative;
+  margin: 20px;
 }
 
-/* backdrop-filter: blur(10px); */
-
 .input-holder {
-    background-color: transparent;
-    color: white;
-    /* width: 100%; */
-    /* padding: 12px; */
-    padding: 4px 5px;
-    padding-top: 12px;
-    font-size: 16px;
-    border: none;
-    border-bottom: 3px solid #52B2E5;
-    outline: none;
+  background-color: transparent;
+  color: white;
+  padding: 4px 5px;
+  padding-top: 12px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 3px solid #52B2E5;
+  outline: none;
+  width: 100%;
 }
 
 .input-holder:focus {
@@ -64,51 +198,51 @@ h2 {
 }
 
 .floating-label {
-    color: #d1d5db;
-    position: absolute;
-    top: -8px;
-    left: 0px;
-    padding: 0px 4px;
-    pointer-events: none;
-    font-size: 14px;
+  color: #d1d5db;
+  position: absolute;
+  top: -8px;
+  left: 0px;
+  padding: 0px 4px;
+  pointer-events: none;
+  font-size: 14px;
 }
 
 button {
-    background: white;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    width: 60px;
-    height: 60px;
-    border-radius: 100%;
-    transition: background 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    justify-self: center
+  background: white;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center
 }
 
 button img {
   filter: 
-    invert(62%) sepia(95%) saturate(743%) hue-rotate(163deg) brightness(99%) contrast(101%);
+  invert(62%) sepia(95%) saturate(743%) hue-rotate(163deg) brightness(99%) contrast(101%);
 }
-
 
 button:hover {
   background: #0ea5e9;
 }
 
 button:hover img {
-    filter: grayscale(0);
+  filter: grayscale(0);
 }
 
 button:active {
-    scale: 1.1;
+  scale: 1.1;
 }
 
-@media (max-width: 1323) {
-.main-class {
+@media (max-width: 1323px) {
+  .main-class {
     grid-template-columns: 1fr;
+    gap: 40px;
   }
 }
 
@@ -119,7 +253,7 @@ button:active {
 }
 
 .report-row {
-    display: grid;
+  display: grid;
 }
 
 .rating-box {
@@ -140,7 +274,7 @@ button:active {
 
 .star {
   cursor: pointer;
-  color: #555; /* darker gray for better contrast */
+  color: #555; 
   transition: color 0.2s ease;
   user-select: none;
 }
@@ -156,29 +290,29 @@ button:active {
 }
 
 .text-holder {
-    width: 100%;
-    margin-top: 6px;
-    background-color: transparent;
-    color: white;
-    padding: 4px 5px;
-    padding-top: 12px;
-    font-size: 16px;
-    border: none;
-    border-bottom: 3px solid #52B2E5;
-    outline: none;
-    resize: none;
+  width: 100%;
+  margin-top: 6px;
+  background-color: transparent;
+  color: white;
+  padding: 4px 5px;
+  padding-top: 12px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 3px solid #52B2E5;
+  outline: none;
+  resize: none;
 }
 
 .button-section {
-    display: flex;
-    justify-content: center;
-
+  display: flex;
+  justify-content: center;
+  
 }
 
 button:hover svg {
-    stroke: white;
+  stroke: white;
 }
 
 .change {
-    display: none;
+  display: none;
 }
