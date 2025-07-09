@@ -10,11 +10,12 @@ body {
 body .form {
   font-family: 'Courier New'
 }
-
+/* check this */
 .page-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* padding-bottom: 160px; */
 }
 
 .steps-indicator {

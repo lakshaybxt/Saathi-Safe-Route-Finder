@@ -1,0 +1,47 @@
+body {
+    padding-top: 80px;
+    font-family: 'Courier New';
+}
+    
+.trust-section {
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+    padding: 60px 20px;
+    flex-wrap: wrap;
+    margin-top: 140px;
+    text-align: center;
+}
+
+.stat-card {
+	max-width: 260px;
+	padding: 20px;
+	border-radius: 12px;
+	backdrop-filter: blur(8px);
+	background: rgba(255, 255, 255, 0.07);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	color: white;
+}
+
+.stat-icon {
+	font-size: 2.5rem;
+	color: #38bdf8; 
+	margin-bottom: 10px;
+}
+
+.stat-card h3 {
+	font-size: 1.3rem;
+	margin-bottom: 8px;
+}
+
+.stat-card p {
+	font-size: 1rem;
+	color: #d1d5db;
+}
+
+.stat-card {
+  transition: transform 0.3s ease;
+}
+.stat-card:hover {
+  transform: scale(1.05);
+}

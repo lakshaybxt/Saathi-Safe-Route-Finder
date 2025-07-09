@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import submit from '../../assets/submit.svg'
 import './place.css'
 import './about.css'
@@ -36,17 +37,35 @@ function Place () {
 				</div>
 			</div>
 					<div className="parent">
-						<div className="child-shadow"></div>
-						<div className="child">
-							Want to share your experience here? <br/>
-							Leave a short testimonial.
-						</div>
+						<motion.div
+						 className="child-shadow"
+							initial={{opacity: 0, y: 30}}
+							whileInView={{opacity:1, y:0}}
+							transition={{ duration: 0.6, ease: "easeOut" }}
+							viewport={{ once: true }}
+						></motion.div>
+							<motion.div 
+								className="child"
+								initial={{ opacity: 0, y: 30 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+								viewport={{ once: true }}
+							>
+								Want to share your experience here? <br/>
+								Leave a short testimonial.
+							</motion.div>
 					</div>
 				</section>
 				
 				<div className='form'>
 					{/* User Place section */}
-					<div className='place-form'>
+					<motion.div 
+						className='place-form'
+						initial={{ opacity: 0, y: 30 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+						viewport={{ once: true }}
+					>
 						<h2>Enter Place Details</h2>
 
 						<div className="form-row">
@@ -82,9 +101,15 @@ function Place () {
 								<img src={submit}/>
 								</button>
 						</div>
-					</div>
+					</motion.div>
 					{/* User Report Area Section */}
-					<div className='testimonial-form change'>
+					<motion.div
+					  className='testimonial-form change'
+						initial={{ opacity: 0, y: 30 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+						viewport={{ once: true }}
+					>
 						<h2>Share Your Experience about <br/> <span>Delhi</span></h2>
 
 						<div className="report-row">
@@ -129,7 +154,7 @@ function Place () {
 							</button>
 						</div>
 
-					</div> 
+					</motion.div> 
 				</div>
 			</div>
 
