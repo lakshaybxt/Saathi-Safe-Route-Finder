@@ -56,4 +56,9 @@ public class PlacesServiceImpl implements PlaceService {
     public List<Place> getHighRiskAreaByState(String color, String state) {
         return placeRepository.findByRiskColorAndStateIgnoreCase(color, state);
     }
+
+    @Override
+    public long getPlaceCount() {
+        return placeRepository.countPlaces();
+    }
 }

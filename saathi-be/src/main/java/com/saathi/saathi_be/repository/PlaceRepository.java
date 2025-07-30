@@ -41,4 +41,7 @@ public interface PlaceRepository extends JpaRepository<Place, UUID> {
         GROUP BY p.risk_color
     """, nativeQuery = true)
     List<Object[]> countRiskColorGroupByState(@Param("state") String state);
+
+    @Query("SELECT COUNT(p) FROM Place p")
+    long countPlaces();
 }

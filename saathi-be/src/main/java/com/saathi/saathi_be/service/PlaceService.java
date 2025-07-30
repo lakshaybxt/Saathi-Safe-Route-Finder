@@ -10,4 +10,5 @@ public interface PlaceService {
     List<Place> getALlPlaces();
     Place saveLocation(@Valid AddressDto addressDto);
     List<Place> getHighRiskAreaByState(String color, String state);
+    long getPlaceCount();
 }

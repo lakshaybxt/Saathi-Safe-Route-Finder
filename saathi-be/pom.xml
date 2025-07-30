@@ -116,6 +116,13 @@
 			<artifactId>caffeine</artifactId>
 		</dependency>
 
+		<!-- Twilio for sending SMS -->
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>10.9.2</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

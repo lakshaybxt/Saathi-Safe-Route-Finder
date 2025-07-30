@@ -85,6 +85,11 @@ public class TestimonialServiceImpl implements TestimonialService {
         testimonialRepository.delete(existingTestimonial);
     }
 
+    @Override
+    public long getReviewers() {
+        return testimonialRepository.count();
+    }
+
     private String calculateRiskColor(UUID placeId, TestimonialDto testimonialDto) {
         List<Testimonial> testimonials = getTestimonialByPlaceId(placeId);
 

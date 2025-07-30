@@ -17,4 +17,5 @@ public interface TestimonialService {
     Testimonial getTestimonialById(UUID id);
     Testimonial updateTestimonial(UUID id, TestimonialDto testimonialDto);
     void deleteTestimonial(UUID id);
+    long getReviewers();
 }

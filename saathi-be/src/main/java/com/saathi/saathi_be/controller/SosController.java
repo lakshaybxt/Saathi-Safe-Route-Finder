@@ -26,7 +26,7 @@ public class SosController {
             @Valid @RequestBody SosEventDto sosEventDto,
             @RequestAttribute UUID userId
     ) {
-        SosEvent sosEvent = sosEventService.saveSosEvent(sosEventDto, userId);
+        SosEvent sosEvent = sosEventService.sendSosEvent(sosEventDto, userId);
         SosResponseDto responseDto = new SosResponseDto("SOS sent successfully", LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }

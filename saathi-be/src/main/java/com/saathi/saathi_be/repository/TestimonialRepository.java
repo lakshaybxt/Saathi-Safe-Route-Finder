@@ -28,4 +28,6 @@ public interface TestimonialRepository extends JpaRepository<Testimonial, UUID> 
     List<Testimonial> findTop5ByPlace_LocalityInOrderByRatingDesc(@Param("parts") String[] parts);
     List<Testimonial> findAllByPlace_Id(UUID placeId);
     List<Testimonial> findAllByUser(User user);
-}
+    @Query("SELECT COUNT(DISTINCT t.user.id) FROM Testimonial t")
+    long countDistinctUsersWithTestimonials();
+    }
