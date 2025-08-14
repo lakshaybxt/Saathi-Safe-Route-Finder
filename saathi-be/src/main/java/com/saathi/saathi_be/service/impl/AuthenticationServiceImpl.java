@@ -64,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public UserDetails authenticate(LoginUserDto request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("Username not found with email"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email"));
 
         if(!user.isEnabled()) {
             throw new RuntimeException("Account not verified yet. Please verify you account");
@@ -83,6 +83,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void verifyUser(VerifyUserDto request) {
         Optional<User> optionalUser = userRepository.findByEmail(request.getEmail());
+
         if(optionalUser.isPresent()) {
             User user = optionalUser.get();
             if(user.getVerificationCodeExpiration().isBefore(LocalDateTime.now())) {
