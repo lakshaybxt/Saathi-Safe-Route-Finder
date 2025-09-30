@@ -21,6 +21,8 @@ import com.saathi.saathi_be.utility.PolylineDecoder;
 import com.saathi.saathi_be.utility.RouteSummaryUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +50,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     private final GeoLocationService geoLocationService;
 
     @Override
+    @CachePut(value = "ROUTE_CACHE", key = "#request.source + '_' + #request.destination + '_' + #request.mode")
     public SafeRouteResponseDto generateSafeRoute(SafeRouteRequestDto request) {
         String mode = request.getMode();
         String orsProfile = mapModeToOrsProfile(mode);
@@ -79,6 +82,7 @@ public class SafeRouteServiceImpl implements SafeRouteService {
     }
 
     @Override
+    @Cacheable(value = "RISK_SUMMARY_CACHE", key = "#state.toLowerCase()")
     public List<RiskSummaryResponse> countRiskColorByState(String state) {
         List<Object[]> places = placeRepository.countRiskColorGroupByState(state.toLowerCase());
 
