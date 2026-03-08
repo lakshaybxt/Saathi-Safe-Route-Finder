@@ -1,0 +1,29 @@
+---
+spring:
+  application:
+    name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authDB
+    username: postgres
+    password: changemeinprod!
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  kafka:
+    bootstrap-servers: localhost:9092
+security:
+  jwt:
+    secret: 6Rk8dVjG0tM1FZT7nLqXztdVd7y9hTqY3FjXZ3qH1Nc=
+    expiration: 3600000
+
+encryption:
+  secret:
+    key: "s8Hd#29pQmF@l3Kv"

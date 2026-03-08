@@ -1,4 +1,4 @@
-package com.saathi.notification.kafka.events;
+package com.saathi.auth.kafka.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

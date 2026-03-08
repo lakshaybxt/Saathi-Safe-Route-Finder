@@ -1,0 +1,53 @@
+---
+repos:
+  # --- Java Checkstyle ---
+  - repo: local
+    hooks:
+      - id: maven-checkstyle
+        name: Run Maven Checkstyle
+        entry: mvn -q checkstyle:check
+        language: system
+        pass_filenames: false
+        types: [java]
+
+      - id: maven-best-practices
+        name: Spring Boot Enterprise Pre-Commit Checks
+        entry: >
+          powershell -NoProfile -ExecutionPolicy Bypass
+          -File scripts/pre-commit-checks.ps1
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+  # --- Dependency Vulnerability Check ---
+  - repo: local
+    hooks:
+      - id: dependency-check
+        name: OWASP Dependency Check
+        entry: >
+          mvn org.owasp:dependency-check-maven:check
+          -Dformat=HTML
+        language: system
+        pass_filenames: false
+
+  # --- Secret Detection (Cross-Platform Safe) ---
+  - repo: local
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets
+        entry: >
+          python -c "import os, subprocess, sys;
+          baseline = os.path.join(os.getcwd(), '.secrets.baseline');
+          subprocess.run(['detect-secrets', 'scan', '--baseline', baseline],
+          check=False)"
+        language: system
+        pass_filenames: false
+        types: [text]
+
+  # --- YAML Linting ---
+  - repo: https://github.com/adrienverge/yamllint
+    rev: 79a6b2b1392eaf49cdd32ac4f14be1a809bbd8f7
+    hooks:
+      - id: yamllint
+        name: YAML Lint
+        entry: yamllint

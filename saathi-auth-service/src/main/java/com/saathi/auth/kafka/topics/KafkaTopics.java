@@ -1,4 +1,4 @@
-package com.saathi.notification.kafka.topics;
+package com.saathi.auth.kafka.topics;
 
 import lombok.Builder;
 
